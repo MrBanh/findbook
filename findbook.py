@@ -7,7 +7,6 @@ import requests as req
 import pyperclip as pc
 import bs4
 import sys
-import os
 
 def findBook(book):
     print(f'Searching for {book}...')
@@ -49,13 +48,12 @@ def findBook(book):
             mirrorRes.raise_for_status()
             mirrorSoup = bs4.BeautifulSoup(mirrorRes.text)
             dlLink = mirrorSoup.select('tr #info h2 a')[0].get('href')
-            bookTitle = mirrorSoup.select('tr #info h1')[0].getText()
             
             # Downloads the file to computer
             print(f'Downloading from {dlLink}...')
             wb.open(dlLink)
 
-    print('Done!')
+    print('\nDone!\n')
 
 
 if len(sys.argv) > 1:

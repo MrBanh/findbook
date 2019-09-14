@@ -8,19 +8,21 @@ import pyperclip as pc
 import bs4
 import sys
 
+
 def findBook(book):
     print(f'Searching for {book}...')
     res = req.get(f'http://gen.lib.rus.ec/search.php?req={book}')
 
-    # Checks if request is successful. If not, stop program and raise exception 
+    # Checks if request is successful. If not, stop program and raise exception
     res.raise_for_status()
 
     # Opens browser to the search results
     wb.open(f'http://gen.lib.rus.ec/search.php?req={book}')
 
     # Parses the HTML obtained from the requests module
-    soup = bs4.BeautifulSoup(res.text)
-    linkElems = soup.select('tr[valign="top"] td[width="500"] a') # Select each link
+    soup = bs4.BeautifulSoup(res.text, features="lxml")
+    linkElems = soup.select(
+        'tr[valign="top"] td[width="500"] a')  # Select each link
     extElems = soup.select('tr[valign="top"] td[nowrap]')
     pdfLinks = []
 
@@ -40,15 +42,17 @@ def findBook(book):
             # Downloads the web page from the pdf link
             pdfRes = req.get(url)
             pdfRes.raise_for_status()
-            pdfSoup = bs4.BeautifulSoup(pdfRes.text) # Parse the page of the pdf link
-            mirrorLink = pdfSoup.select('tr td a[title="Gen.lib.rus.ec"]')    # Choose the first mirror
-            
+            # Parse the page of the pdf link
+            pdfSoup = bs4.BeautifulSoup(pdfRes.text, features="lxml")
+            # Choose the first mirror
+            mirrorLink = pdfSoup.select('tr td a[title="Gen.lib.rus.ec"]')
+
             # Downloads the web page of the first mirror download link
             mirrorRes = req.get(mirrorLink[0].get('href'))
             mirrorRes.raise_for_status()
-            mirrorSoup = bs4.BeautifulSoup(mirrorRes.text)
-            dlLink = mirrorSoup.select('tr #info h2 a')[0].get('href')
-            
+            mirrorSoup = bs4.BeautifulSoup(mirrorRes.text, features="lxml")
+            dlLink = 'http://93.174.95.29' + mirrorSoup.select('tr #info h2 a')[0].get('href')
+
             # Downloads the file to computer
             print(f'Downloading from {dlLink}...')
             wb.open(dlLink)

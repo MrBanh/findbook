@@ -51,7 +51,7 @@ def findBook(book):
             mirrorRes = req.get(mirrorLink[0].get('href'))
             mirrorRes.raise_for_status()
             mirrorSoup = bs4.BeautifulSoup(mirrorRes.text, features="lxml")
-            dlLink = 'http://93.174.95.29' + mirrorSoup.select('tr #info h2 a')[0].get('href')
+            dlLink = mirrorSoup.select('#download > h2 > a')[0].get('href')
 
             # Downloads the file to computer
             print(f'Downloading from {dlLink}...')
